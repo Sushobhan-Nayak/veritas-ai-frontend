@@ -1,7 +1,7 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfH0iVwvCfQe4R54x2-R7bDunP5IH6kF1ixg&s");
+  /* background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfH0iVwvCfQe4R54x2-R7bDunP5IH6kF1ixg&s"); */
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
@@ -42,7 +42,6 @@ select {
   gap: 1rem;
   padding: 2rem;
   max-width: 800px;
-  margin: auto;
 }
 
 .button-grid button {
@@ -54,6 +53,7 @@ select {
   border-radius: 20px;
   cursor: pointer;
   transition: all 0.3s ease;
+  justify-content: center;
 }
 
 .button-grid button:hover {
@@ -81,6 +81,7 @@ select {
   background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfH0iVwvCfQe4R54x2-R7bDunP5IH6kF1ixg&s");
   background-size: cover;
   min-height: 100vh;
+  width: auto;
   padding: 2rem;
 }
 
@@ -227,14 +228,13 @@ select {
   align-items: center;
   background-color: #f0f0f0;
   padding: 0.5rem 1rem;
-  margin: 1rem;
+  margin: 1rem 0;
   border-radius: 5px;
   font-size: 0.9rem;
   color: #333;
 }
 
 .weather-info-left {
-  flex: 1;
   padding-right: 1rem;
 }
 
@@ -259,7 +259,7 @@ select {
 }
 
 .weather-info-right {
-  flex: 1;
+  flex: 3;
   text-align: right;
   padding-left: 1rem;
   color:red;
@@ -307,4 +307,8 @@ table th {
 
 table tr:last-child td {
   border-bottom: 0;
+}
+
+.grey-button{
+  background-color: grey;
 }

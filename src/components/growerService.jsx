@@ -2,13 +2,67 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../style/growerService.css";
 import {
-  SOIL_ANALYSIS_API_URL,
   GROWER_RECOMMEN_API_URL,
   AGENT_APP_NAME,
   AGENT_USER_ID,
   AGENT_SESSION_ID,
 } from "../config";
 import useGeolocation from "../hooks/useGeolocation";
+
+const ExpandableItem = ({ title, description }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  if (!description) {
+    return <p style={{ whiteSpace: "pre-wrap" }}>{title}</p>;
+  }
+
+  return (
+    <div className="expandable-item">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        style={{
+          background: "none",
+          border: "none",
+          padding: "0.25rem 0",
+          margin: 0,
+          cursor: "pointer",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          width: "100%",
+          textAlign: "left",
+          fontSize: "1em",
+        }}
+      >
+        <strong>{title}</strong>
+        <span
+          style={{
+            fontSize: "1em",
+            marginLeft: "0.5rem",
+            color: "black",
+            fontWeight: "bold",
+          }}
+        >
+          {isOpen ? "−" : "+"}
+        </span>
+      </button>
+      {isOpen && (
+        <div
+          style={{
+            marginTop: "0.5rem",
+            paddingLeft: "1rem",
+          }}
+        >
+          {typeof description === "string" ? (
+            <p style={{ whiteSpace: "pre-wrap" }}>{description}</p>
+          ) : (
+            description
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const GrowerService = () => {
   const [services, setServices] = useState([]);
@@ -28,7 +82,7 @@ const GrowerService = () => {
       const { latitude, longitude } = location;
       const locationText = `My location is latitude: ${latitude} and longitude: ${longitude}.`;
 
-      const soilPayload = {
+      const payload = {
         appName: AGENT_APP_NAME,
         userId: AGENT_USER_ID,
         sessionId: AGENT_SESSION_ID,
@@ -36,42 +90,75 @@ const GrowerService = () => {
           role: "user",
           parts: [
             {
-              text: `Provide a brief soil analysis based on my location. ${locationText}`,
+              text: `Provide a brief soil analysis, crop recommendations for large and small scale farmers, general considerations, grower services and fertilizer recommendations based on my location. ${locationText}`,
             },
           ],
         },
       };
 
-      const growerPayload = {
-        appName: AGENT_APP_NAME,
-        userId: AGENT_USER_ID,
-        sessionId: AGENT_SESSION_ID,
-        newMessage: {
-          role: "user",
-          parts: [
-            {
-              text: `Provide crop recommendations for large and small scale farmers, and general considerations. ${locationText}`,
-            },
-          ],
-        },
+      const renderRecommendations = (data, level = 0, parser) => {
+        return Object.entries(data).map(([key, value], index, array) => {
+          const isLastItem = index === array.length - 1;
+          const isNumericKey = /^\d+$/.test(key);
+          const formattedKey = key
+            .replace(/_/g, " ")
+            .replace(/\b\w/g, (l) => l.toUpperCase());
+
+          return (
+            <div key={key}>
+              <div className="recommendation-section">
+                {!isNumericKey && (
+                  <strong
+                    style={{
+                      color: "black",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {formattedKey}
+                  </strong>
+                )}
+                {typeof value === "string" ? (
+                  (() => {
+                    const { title, description } = parser(value);
+                    return (
+                      <ExpandableItem title={title} description={description} />
+                    );
+                  })()
+                ) : (
+                  <div style={{ paddingLeft: isNumericKey ? "0" : "1rem" }}>
+                    {renderRecommendations(value, level + 1, parser)}
+                  </div>
+                )}
+              </div>
+              {!isLastItem && !isNumericKey && (
+                <hr className="recommendation-divider" />
+              )}
+            </div>
+          );
+        });
+      };
+
+      const cropParser = (text) => {
+        const parts = text.split(/:(.*)/s);
+        return {
+          title: parts[0],
+          description: parts.length > 1 ? parts[1].trim() : "",
+        };
       };
 
       try {
-        const [soilResponse, growerResponse] = await Promise.all([
-          axios.post(SOIL_ANALYSIS_API_URL, soilPayload, {
-            headers: { "Content-Type": "application/json" },
-          }),
-          axios.post(GROWER_RECOMMEN_API_URL, growerPayload, {
-            headers: { "Content-Type": "application/json" },
-          }),
-        ]);
-        console.log(soilResponse, growerResponse);
+        const response = await axios.post(GROWER_RECOMMEN_API_URL, payload, {
+          headers: { "Content-Type": "application/json" },
+        });
         // Process Soil Analysis Response
-        const soilAgentResponse = soilResponse.data.soil_alert;
+        const soilAgentResponse = response.data.soil_alert;
         let soilContent;
 
         try {
-          const parsedSoilData = JSON.parse(soilAgentResponse);
+          const parsedSoilData =
+            typeof soilAgentResponse === "string"
+              ? JSON.parse(soilAgentResponse)
+              : soilAgentResponse;
           const {
             location_output,
             soil_Health_card,
@@ -131,15 +218,15 @@ const GrowerService = () => {
                       const description = parts[1] ? parts[1].trim() : "";
                       return (
                         <div className="key-service" key={index}>
-                          <strong
-                            style={{ color: "black", fontSize: "0.9em" }}
-                          >
-                            {title}
-                          </strong>
-                          {description && <p style={{ whiteSpace: "pre-wrap" }}>{description}</p>}
+                          <strong style={{ color: "black" }}>{title}</strong>
+                          {description && (
+                            <p style={{ whiteSpace: "pre-wrap" }}>
+                              {description}
+                            </p>
+                          )}
                         </div>
                       );
-                    },
+                    }
                   )}
                 </div>
               )}
@@ -152,16 +239,11 @@ const GrowerService = () => {
                     const description = parts[1] ? parts[1].trim() : "";
                     return (
                       <div className="key-service" key={index}>
-                        <strong
-                          style={{
-                            color: "black",
-                            fontSize: "0.9em",
-                          }}
-                        >
-                          {title}
-                        </strong>
+                        <strong style={{ color: "black" }}>{title}</strong>
                         {description && (
-                          <p style={{ whiteSpace: "pre-wrap" }}>{description}</p>
+                          <p style={{ whiteSpace: "pre-wrap" }}>
+                            {description}
+                          </p>
                         )}
                       </div>
                     );
@@ -174,47 +256,118 @@ const GrowerService = () => {
           // Fallback for non-JSON or malformed JSON response
           soilContent = (
             <p style={{ whiteSpace: "pre-wrap" }}>
-              {soilAgentResponse || "Could not retrieve soil analysis data."}
+              {String(soilAgentResponse) ||
+                "Could not retrieve soil analysis data."}
             </p>
           );
         }
 
         // Process Grower Recommendation Response
-        const growerAgentResponse = growerResponse.data.crop_alert;
+        const growerAgentResponse = response.data.crop_alert;
+
         let growerContent;
         try {
-          const parsedData = JSON.parse(growerAgentResponse);
-
-          const renderRecommendations = (data) => {
-            return Object.entries(data).map(([key, value], index, array) => {
-              const isLastItem = index === array.length - 1;
-              return (
-                <div key={key}>
-                  <div className="recommendation-section">
-                    <strong style={{ color: "black", fontSize: "0.9em" }}>
-                      {key}
-                    </strong>
-                    {typeof value === "string" ? (
-                      <p style={{ whiteSpace: "pre-wrap" }}>{value}</p>
-                    ) : (
-                      <div style={{ paddingLeft: "1rem" }}>
-                        {renderRecommendations(value)}
-                      </div>
-                    )}
-                  </div>
-                  {!isLastItem && <hr className="recommendation-divider" />}
-                </div>
-              );
-            });
-          };
-
-          growerContent = renderRecommendations(parsedData);
+          const parsedData =
+            typeof growerAgentResponse === "string"
+              ? JSON.parse(growerAgentResponse)
+              : growerAgentResponse;
+          growerContent = renderRecommendations(parsedData, 0, cropParser);
         } catch (e) {
           // If it's not a JSON string, use it as is.
           growerContent = (
             <p style={{ whiteSpace: "pre-wrap" }}>
-              {growerAgentResponse ||
+              {String(growerAgentResponse) ||
                 "Could not retrieve crop recommendation data."}
+            </p>
+          );
+        }
+
+        // Process Fertilizer Recommendation Response
+        const fertilizerAgentResponse = response.data.fertilizer_alert;
+        
+        let fertilizerContent;
+        try {
+          const parsedData =
+            typeof fertilizerAgentResponse === "string"
+              ? JSON.parse(fertilizerAgentResponse)
+              : fertilizerAgentResponse;
+
+          const formatKey = (key) =>
+            key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+
+          const renderObjectDetails = (obj) => {
+            return Object.entries(obj).map(([key, value]) => (
+              <p key={key} style={{ margin: "0.25rem 0" }}>
+                <strong>{formatKey(key)}:</strong> {String(value)}
+              </p>
+            ));
+          };
+
+          fertilizerContent = Object.entries(parsedData).map(
+            ([sectionKey, sectionValue]) => (
+              <div key={sectionKey} style={{ marginBottom: "1rem" }}>
+                <h4>{formatKey(sectionKey)}</h4>
+                {(() => {
+                  if (
+                    sectionKey === "fertilizer_recommendations" &&
+                    sectionValue.primary_fertilizers
+                  ) {
+                    return sectionValue.primary_fertilizers.map(
+                      (item, index) => (
+                        <ExpandableItem
+                          key={index}
+                          title={`${item.fertilizer_name} (${item.application_rate_per_acre})`}
+                          description={renderObjectDetails({
+                            application_timing: item.application_timing,
+                            application_method: item.application_method,
+                            estimated_cost_per_acre:
+                              item.estimated_cost_per_acre,
+                            benefits_for_recommended_crops:
+                              item.benefits_for_recommended_crops,
+                          })}
+                        />
+                      )
+                    );
+                  }
+                  if (sectionKey === "local_suppliers") {
+                    return Object.entries(sectionValue).map(
+                      ([type, items]) => (
+                        <div key={type}>
+                          <h5>{formatKey(type)}</h5>
+                          {items.map((item, index) => {
+                            const {
+                              outlet_type,
+                              dealer_type,
+                              platform,
+                              ...details
+                            } = item;
+                            const title = outlet_type || dealer_type || platform;
+                            return (
+                              <ExpandableItem
+                                key={index}
+                                title={title}
+                                description={renderObjectDetails(details)}
+                              />
+                            );
+                          })}
+                        </div>
+                      )
+                    );
+                  }
+                  if (sectionKey === "monitoring_recommendations") {
+                    return renderObjectDetails(sectionValue);
+                  }
+                  return null;
+                })()}
+              </div>
+            )
+          );
+        } catch (e) {
+          // If it's not a JSON string, use it as is.
+          fertilizerContent = (
+            <p style={{ whiteSpace: "pre-wrap" }}>
+              {String(fertilizerAgentResponse) ||
+                "Could not retrieve fertilizer recommendation data."}
             </p>
           );
         }
@@ -229,7 +382,12 @@ const GrowerService = () => {
           content: growerContent,
         };
 
-        setServices([soilCard, growerCard]);
+        const fertilizerCard = {
+          title: "Fertilizer Recommendation",
+          content: fertilizerContent,
+        };
+
+        setServices([soilCard, growerCard, fertilizerCard]);
       } catch (error) {
         console.error("Failed to fetch service data:", error);
         setServices([]); // Clear services on any error
@@ -246,17 +404,34 @@ const GrowerService = () => {
   return (
     <div className="glass-background">
       <h2>Grower Service</h2>
-      <div className="grower-services-grid">
+      <div
+        className="grower-services-grid"
+        style={{ width: "90%", margin: "0 auto" }}
+      >
         {loading ? (
-          [...Array(2)].map((_, index) => (
+          [...Array(3)].map((_, index) => (
             <div className="grower-service-card" key={index}>
               <div className="card-loader"></div>
             </div>
           ))
         ) : services.length > 0 ? (
           services.map((service, index) => (
-            <div className="grower-service-card" key={index}>
-              <h3>{service.title}</h3>
+            <div
+              className={`grower-service-card ${
+                service.title === "Fertilizer Recommendation"
+                  ? "fertilizer-card"
+                  : ""
+              }`}
+              key={index}
+            >              <h3
+                className={
+                  service.title === "Fertilizer Recommendation"
+                    ? "fertilizer-title"
+                    : ""
+                }
+              >
+                {service.title}
+              </h3>
               <div className="service-content">{service.content}</div>
             </div>
           ))

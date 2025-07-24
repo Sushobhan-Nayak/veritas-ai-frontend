@@ -14,20 +14,17 @@ const Profit = () => {
   return (
     <>
       <GoogleTranslate />
-      <div className="container main-back">
-        {loading && <Loader />}
-        <BackWeather />
-        <h1 className="header">
-          Improve Profitability
+      <BackWeather />
+      <header>
+        <h1>
+          Cultivating India's Future with Agentic AI - Powered by Veritas AI
         </h1>
-        <div className="glass-background">
-          <h2>Profitability Tools</h2>
-          <p>Content related to improving profitability will be here.</p>
-        </div>
-        <button className="chat-button" onClick={handleOpenAskModal}>
-          <span role="img" aria-label="ask-mic">🎤</span>
-        </button>
-      </div>
+      </header>
+      <button className="chat-button" onClick={handleOpenAskModal}>
+        <span role="img" aria-label="ask-mic">
+          🎤
+        </span>
+      </button>
       <Ask isOpen={isAskModalOpen} onClose={handleCloseAskModal} />
     </>
   );

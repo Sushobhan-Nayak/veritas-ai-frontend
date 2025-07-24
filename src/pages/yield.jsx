@@ -117,7 +117,7 @@ const Yield = () => {
         role: "user",
         parts: [
           {
-            text: userResponse,
+            text: userResponse + '. For disease diagnosis.',
           },
         ],
       },
@@ -170,6 +170,7 @@ const Yield = () => {
 
   return (
     <>
+    
       <GoogleTranslate />
       <div className="container main-back">
         {loading && <Loader />}
@@ -180,6 +181,8 @@ const Yield = () => {
             Cultivating India's Future with Agentic AI - Powered by Veritas AI
           </h1>
         </header>
+
+        <h2 style={{ color: "white", textAlign: "center" }}>IMPROVE YIELD</h2>
 
         <div className="glass-background">
           <h2>Disease Identification</h2>

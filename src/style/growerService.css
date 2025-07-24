@@ -4,8 +4,7 @@
   gap: 20px;
   padding: 20px;
   width: 100%;
-  max-width: 1200px;
-  margin: 20px auto 0;
+  margin: 20px 0 0;
 }
 
 .key-services-section {
@@ -83,6 +82,10 @@
   text-align: center;
 }
 
+.fertilizer-card {
+  color: black;
+}
+
 .grower-service-card h3 {
   margin-top: 0;
   font-size: 1.8rem;
@@ -94,6 +97,10 @@
 .key-service strong {
   color: blue;
   font-size: 1.3rem;
+}
+
+.grower-service-card h3.fertilizer-title {
+  color: black;
 }
 
 .card-loader {
@@ -123,4 +130,12 @@
   100% {
     transform: rotate(360deg);
   }
+}
+
+.expandable-item button {
+  color: #00008b;
+}
+
+.expandable-item :focus {
+  outline: none;
 }

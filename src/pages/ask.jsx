@@ -120,7 +120,7 @@ const Ask = ({ isOpen, onClose }) => {
 
     let messageText = userMessage;
     if (location?.latitude && location?.longitude) {
-      messageText = `${userMessage}. My location is latitude: ${location.latitude} and longitude: ${location.longitude}.`;
+      messageText = `${userMessage}. My location is latitude: ${location.latitude} and longitude: ${location.longitude}. Askmeanything`;
     }
 
     const payload = {

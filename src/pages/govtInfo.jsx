@@ -52,7 +52,8 @@ const schemes = [
   {
     label: "Kisan Credit Card (KCC)",
     url: "https://www.myscheme.gov.in/schemes/kcc",
-    description: "A credit scheme to meet the short-term credit requirements for cultivation of crops, post-harvest expenses, and other farm-related activities at a subsidized interest rate.",
+    description:
+      "A credit scheme to meet the short-term credit requirements for cultivation of crops, post-harvest expenses, and other farm-related activities at a subsidized interest rate.",
     faqs: [
       {
         q: "Scheme details",
@@ -87,7 +88,8 @@ const schemes = [
   {
     label: "Seed Bank",
     url: "https://seednet.gov.in/",
-    description: "Scheme to make quality seeds of all crops available to farmers at affordable prices.",
+    description:
+      "Scheme to make quality seeds of all crops available to farmers at affordable prices.",
     faqs: [
       {
         q: "Scheme details",
@@ -114,7 +116,8 @@ const schemes = [
   {
     label: "Kisan Samman Nidhi",
     url: "https://pmkisan.gov.in/",
-    description: "Pradhan Mantri Kisan Samman Nidhi provides income support of ₹6,000 per year to all landholding farmer families.",
+    description:
+      "Pradhan Mantri Kisan Samman Nidhi provides income support of ₹6,000 per year to all landholding farmer families.",
     faqs: [
       {
         q: "Scheme details",
@@ -141,7 +144,8 @@ const schemes = [
   {
     label: "ATMA Scheme",
     url: "https://extensionreforms.dac.gov.in/",
-    description: "Agricultural Technology Management Agency (ATMA) scheme for strengthening extension services and promoting new technologies.",
+    description:
+      "Agricultural Technology Management Agency (ATMA) scheme for strengthening extension services and promoting new technologies.",
     faqs: [
       {
         q: "Scheme details",
@@ -164,7 +168,8 @@ const schemes = [
   {
     label: "Agri Infra fund",
     url: "https://agrinfra.dac.gov.in/",
-    description: "A financing facility for creation of post-harvest management infrastructure and community farming assets.",
+    description:
+      "A financing facility for creation of post-harvest management infrastructure and community farming assets.",
     faqs: [
       {
         q: "Scheme details",
@@ -195,7 +200,8 @@ const schemes = [
   {
     label: "E-Nam",
     url: "https://enam.gov.in/web/",
-    description: "Electronic National Agriculture Market (eNAM) is a pan-India electronic trading portal for agricultural commodities.",
+    description:
+      "Electronic National Agriculture Market (eNAM) is a pan-India electronic trading portal for agricultural commodities.",
     faqs: [
       {
         q: "Scheme details",
@@ -218,7 +224,8 @@ const schemes = [
   {
     label: "Soil Health Card",
     url: "https://soilhealth.dac.gov.in/home",
-    description: "A scheme to provide every farmer with a soil health card which will carry crop-wise recommendations of nutrients and fertilizers required for the individual farms.",
+    description:
+      "A scheme to provide every farmer with a soil health card which will carry crop-wise recommendations of nutrients and fertilizers required for the individual farms.",
     faqs: [
       {
         q: "Scheme details",
@@ -237,7 +244,8 @@ const schemes = [
   {
     label: "National Mission on Natural Farming",
     url: "https://naturalfarming.dac.gov.in/",
-    description: "A scheme to promote traditional, chemical-free farming methods to reduce costs and improve soil health.",
+    description:
+      "A scheme to promote traditional, chemical-free farming methods to reduce costs and improve soil health.",
     faqs: [
       {
         q: "Scheme details",
@@ -286,7 +294,9 @@ function SchemeDetailsModal({ isOpen, onClose, scheme }) {
         <p>{scheme.description}</p>
         <hr />
         <div className="faqs-container">
-          {scheme.faqs.map((faq, index) => <FaqItem key={index} faq={faq} />)}
+          {scheme.faqs.map((faq, index) => (
+            <FaqItem key={index} faq={faq} />
+          ))}
         </div>
         <a href={scheme.url} target="_blank" rel="noopener noreferrer">
           Visit Scheme Website
@@ -316,40 +326,42 @@ function GovtInfo() {
   return (
     <>
       <GoogleTranslate />
-      <BackWeather />
-      <header>
-        <h1>
-          Cultivating India's Future with Agentic AI - Powered by Veritas AI
-        </h1>
-      </header>
+      <div className="container main-back">
+        <BackWeather />
+        <header>
+          <h1>
+            Cultivating India's Future with Agentic AI - Powered by Veritas AI
+          </h1>
+        </header>
 
-      <div className="schemes-grid">
-        {schemes.map((scheme, index) => (
-          <div
-            key={index}
-            className="card"
-            onClick={() => handleOpenSchemeModal(scheme)}
-          >
-            <h3>{scheme.label}</h3>
-            <p>{scheme.description}</p>
-          </div>
-        ))}
+        <div className="schemes-grid">
+          {schemes.map((scheme, index) => (
+            <div
+              key={index}
+              className="card"
+              onClick={() => handleOpenSchemeModal(scheme)}
+            >
+              <h3>{scheme.label}</h3>
+              <p>{scheme.description}</p>
+            </div>
+          ))}
+        </div>
+
+        {selectedScheme && (
+          <SchemeDetailsModal
+            isOpen={isSchemeModalOpen}
+            onClose={handleCloseSchemeModal}
+            scheme={selectedScheme}
+          />
+        )}
+
+        <button className="chat-button" onClick={handleOpenAskModal}>
+          <span role="img" aria-label="ask-mic">
+            🎤
+          </span>
+        </button>
+        <Ask isOpen={isAskModalOpen} onClose={handleCloseAskModal} />
       </div>
-
-      {selectedScheme && (
-        <SchemeDetailsModal
-          isOpen={isSchemeModalOpen}
-          onClose={handleCloseSchemeModal}
-          scheme={selectedScheme}
-        />
-      )}
-
-      <button className="chat-button" onClick={handleOpenAskModal}>
-        <span role="img" aria-label="ask-mic">
-          🎤
-        </span>
-      </button>
-      <Ask isOpen={isAskModalOpen} onClose={handleCloseAskModal} />
     </>
   );
 }
