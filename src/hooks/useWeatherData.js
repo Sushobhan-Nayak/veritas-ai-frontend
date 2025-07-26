@@ -79,7 +79,7 @@ const useWeatherData = () => {
               parts: [{ text: `My location is latitude: ${latitude} and longitude: ${longitude}. Provide the warning alerts for weather.` }],
             },
           },
-          { headers: { "Content-Type": "application/json" } }
+          { headers: { "Content-Type": "application/json","Authorization": `Bearer ya29.c.c0ASRK0GbTMIS0vq7VO-q0gmpF76UgCpnQfJM-INTKXK4UEUUXRmacntYTeVAbMUNvlqWPsm7K5Hl4j-KVdHilD6SnXnFwa9iJFvsvR81DK07JYMof2tyedXRtHxtaL6PAES-bxVGDCLphf0CWqm3cgoZnfQCDrI2_zclx9tASMAdlq2_VJBTJO8i5peDKdS7jW7mxma63FXfKeYxUii0bbLgejSHjAzj96PiXD1NEUV_nxivFqcJd5UYasg5J0nLEcbaDC3Imbd8AGCCSzqCd1dCq31ILfE4IwqlzJI0e0aTBfn38-vgaOSFyCPWLisBM5B9FlZeZ9yIy0lovDIrJgGsWfN_7g9QwrEJDtOaXnxMNaUYG7xybYsIDP_ePZaKp50JcALP8CHHDXhnMxqcL412AO_z2mxV2mQJcu7g4hZ52WWXRJR-62gbnFRhwmI746vjjxtU1cm1ivWlJt0n11_rhRddBJakUacn06F1Zi1zwwFpsz5_kh6Ovs9x-o7c2QnMtxcbX2zgV7VnRgYaQjeZJoFpzovveicQx88WdIp_i9V9IUhIdyF1xdp6vFzdxdb-c4XtVn6WqdJ510Og8QdMyIqV5WZv-UzZamO0MFJjykS52QMI4Xf5bdVdv7smFcyzZnRB__BM93o3Ymtapwyj5FJbdeo1ZJRMQZbjuOMrWWQsFYyb1ciJuu4_Jqu3drwFwY_y0Z-SIIj3UIV1W9zWuYk717XyxlMYzncaX4veIItcw5Bhc7lst9Xp433ocrna87aFYjXhjwc1qddbcYp1oR3teOvwVjvn2mz9BSRWg33jYWol-g4-nMlOq2kcdyVxMdRWgjyg4i7o1wurtI7pkXvgB7qj3ekv-nuMv_nhtYpUWQzU2I0di4lBWRF6O4egVhVOxr6tFtWIc1SJjmikenSQYZSVM7os1dvmB2128xbW-cu_eq3jnMSe09jfv80lh7id0oZxuv2yjJleMf1p9QRh7b8hzVke2-oIRQy2991eSexYqsvM`, } }
         ),
       ]);
 

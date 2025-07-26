@@ -45,7 +45,7 @@ const MapComponent = ({ location, searchKeyword }) => {
   const [places, setPlaces] = useState([]);
   const [originalPlaces, setOriginalPlaces] = useState([]);
   const [selectedPlace, setSelectedPlace] = useState(null);
-  const [directions, setDirections] = useState(null);
+  // const [directions, setDirections] = useState(null);
 
   const onMapLoad = useCallback((mapInstance) => {
     setMap(mapInstance);
@@ -89,30 +89,30 @@ const MapComponent = ({ location, searchKeyword }) => {
     setDirections(null);
   };
 
-  const handleGetDirections = (place) => {
-    if (!location || !map || !place.geometry?.location) return;
+  // const handleGetDirections = (place) => {
+  //   if (!location || !map || !place.geometry?.location) return;
 
-    const directionsService = new window.google.maps.DirectionsService();
-    directionsService.route(
-      {
-        origin: new window.google.maps.LatLng(
-          location.latitude,
-          location.longitude
-        ),
-        destination: place.geometry.location,
-        travelMode: window.google.maps.TravelMode.DRIVING,
-      },
-      (result, status) => {
-        if (status === window.google.maps.DirectionsStatus.OK) {
-          setDirections(result);
-          setPlaces([]); // Hide other places when showing directions
-          setSelectedPlace(null); // Hide InfoWindow when showing directions
-        } else {
-          console.error(`error fetching directions ${result}`);
-        }
-      }
-    );
-  };
+  //   const directionsService = new window.google.maps.DirectionsService();
+  //   directionsService.route(
+  //     {
+  //       origin: new window.google.maps.LatLng(
+  //         location.latitude,
+  //         location.longitude
+  //       ),
+  //       destination: place.geometry.location,
+  //       travelMode: window.google.maps.TravelMode.DRIVING,
+  //     },
+  //     (result, status) => {
+  //       if (status === window.google.maps.DirectionsStatus.OK) {
+  //         setDirections(result);
+  //         setPlaces([]); // Hide other places when showing directions
+  //         setSelectedPlace(null); // Hide InfoWindow when showing directions
+  //       } else {
+  //         console.error(`error fetching directions ${result}`);
+  //       }
+  //     }
+  //   );
+  // };
 
   const handleBackToList = () => {
     setDirections(null);
@@ -173,23 +173,23 @@ const MapComponent = ({ location, searchKeyword }) => {
               <div className="location-box">
                 <h4>{selectedPlace.name}</h4>
                 <p>{selectedPlace.vicinity}</p>
-                <button onClick={() => handleGetDirections(selectedPlace)}>
+                {/* <button onClick={() => handleGetDirections(selectedPlace)}>
                   Get Directions
-                </button>
+                </button> */}
               </div>
             </InfoWindow>
           )}
 
-          {directions && <DirectionsRenderer directions={directions} />}
+          {/* {directions && <DirectionsRenderer directions={directions} />} */}
         </GoogleMap>
       </div>
       <div style={listContainerStyle}>
-        {directions ? (
+        {/* {directions ? (
           <div>
             <h4>Directions</h4>
             <button onClick={handleBackToList}>Back to List</button>
           </div>
-        ) : (
+        ) : ( */}
           <>
             <h4>
               Nearby{" "}
@@ -222,7 +222,7 @@ const MapComponent = ({ location, searchKeyword }) => {
               ))}
             </ul>
           </>
-        )}
+        {/* )} */}
       </div>
     </div>
   );
