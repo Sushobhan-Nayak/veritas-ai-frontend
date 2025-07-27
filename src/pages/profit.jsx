@@ -31,6 +31,7 @@ const Profit = () => {
   const handleSubmit = async () => {
     if(!location){
       alert('No location found.')
+      return;
     }
     
     setLoading(true);
