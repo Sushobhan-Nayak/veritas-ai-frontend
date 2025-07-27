@@ -4,7 +4,7 @@ import NavbarWeatherInfo from '../components/navbarWeatherInfo';
 const Navbar = () => {
   return (
       <>
-      <div style={{ display: 'flex' }}>
+      <div style={{ display: 'flex', padding: '1rem' }}>
         <NavbarWeatherInfo />
       </div>
       </>

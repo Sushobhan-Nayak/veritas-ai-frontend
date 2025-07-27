@@ -1,109 +1,88 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import useWeatherData from "../hooks/useWeatherData";
 
 const WeatherInfo = () => {
-  const getYYYYMMDD = (offset) => {
+  // 1. FIX: Changed function to produce DD-MM-YYYY format
+  const getDDMMYYYY = (offset) => {
     const d = new Date();
     d.setDate(d.getDate() + offset);
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, "0");
     const day = String(d.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
+    return `${day}-${month}-${year}`;
   };
 
   const { weather, locationName, allAgentWeather, loading, locationError } =
     useWeatherData();
-  const [selectedDate, setSelectedDate] = useState(getYYYYMMDD(0));
-  const [agentWeatherInfo, setAgentWeatherInfo] = useState(
-    "Select a date to see the weather summary."
-  );
+  const [selectedDate, setSelectedDate] = useState(getDDMMYYYY(0));
 
-  useEffect(() => {
-    if (loading) {
-      setAgentWeatherInfo("Fetching weather summary...");
-      return;
-    }
-    if (allAgentWeather) {
-      const forecast = allAgentWeather[selectedDate];
-      if (Array.isArray(forecast) && forecast.length > 0) {
-        setAgentWeatherInfo(
-          <ul>
-            {forecast.map((item, index) => (
-              <li key={index}>{item}</li>
-            ))}
-          </ul>
-        );
-      } else {
-        setAgentWeatherInfo("No forecast available for this day.");
-      }
-    } else if (!locationError) {
-      setAgentWeatherInfo("Could not fetch weather summary.");
-    }
-  }, [selectedDate, allAgentWeather, loading, locationError]);
+  // 2. FIX: Removed unnecessary useEffect and agentWeatherInfo state.
+  // We will calculate what to display directly in the return statement.
 
   const getFormattedDate = (offset) => {
     const date = new Date();
     date.setDate(date.getDate() + offset);
     return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
   };
+  
+  // Helper function to render the forecast
+  const renderForecast = () => {
+    if (locationError) return <p>Could not fetch weather summary.</p>;
+    if (!allAgentWeather) return <p>Weather summary is unavailable.</p>;
 
-  const tomorrow = getFormattedDate(1);
-  const dayAfterTomorrow = getFormattedDate(2);
-
-  const todayDate = getYYYYMMDD(0);
-  const tomorrowDate = getYYYYMMDD(1);
-  const dayAfterDate = getYYYYMMDD(2);
+    const forecast = allAgentWeather[selectedDate];
+    
+    if (Array.isArray(forecast) && forecast.length > 0) {
+      return (
+        <ul>
+          {forecast.map((item, index) => (
+            <li key={index}>{item}</li>
+          ))}
+        </ul>
+      );
+    }
+    return <p>No forecast available for this day.</p>;
+  };
 
   return (
-    <div className="weather-info" style={{ display: 'flex'}}>
-     <div className="weather-info-left" style={{ paddingRight: '1rem' }}>
+    <div className="weather-info" style={{ display: 'flex', padding: '2rem' }}>
+      <div className="weather-info-left" style={{ paddingRight: '1rem' }}>
         <strong>Location:</strong>
         <br />
         {locationError || locationName || "Fetching location..."}
         <br />
-        <strong>Weather:</strong>
+        <br />
+        <strong>Current Weather:</strong>
         <br />
         {weather
           ? (
             <>
-              <strong>{weather.temperature}</strong> ({weather.temp_min} / {weather.temp_max}), {weather.condition}
+              {weather.temperature}, {weather.condition}
               <br />
-              Humidity: {weather.humidity} | Pressure: {weather.pressure}
+              <strong>Humidity:</strong> {weather.humidity} | <strong>Pressure:</strong> {weather.pressure}
               <br />
-              Sea Level Pressure: {weather.sea_level}
-              <br />
-              Wind: {weather.wind.speed} from {weather.wind.deg}{weather.wind.gust && ` (gusts: ${weather.wind.gust})`}
+              <strong>Wind:</strong> {weather.wind.speed} from {weather.wind.deg}{weather.wind.gust && ` (gusts: ${weather.wind.gust})`} 
             </>
           )
           : (loading ? "Loading weather..." : "Weather data unavailable.")}
       </div>
       <div className="weather-info-divider"></div>
-      <div
-        className="weather-info-right"
-        style={{
-          paddingLeft: "1rem",
-          textAlign: "left",
-        }}
-      >
+      <div className="weather-info-right" style={{ paddingLeft: "1rem", textAlign: "left" }}>
         <select
           name="date-select"
           id="date-select"
           value={selectedDate}
           onChange={(e) => setSelectedDate(e.target.value)}
         >
-          <option value={todayDate}>Today</option>
-          <option value={tomorrowDate}>{`Tomorrow, ${tomorrow}`}</option>
-          <option
-            value={dayAfterDate}
-          >{`Next Day, ${dayAfterTomorrow}`}</option>
+          <option value={getDDMMYYYY(0)}>Today</option>
+          <option value={getDDMMYYYY(1)}>{`Tomorrow, ${getFormattedDate(1)}`}</option>
+          <option value={getDDMMYYYY(2)}>{`Next Day, ${getFormattedDate(2)}`}</option>
         </select>
         <div className="static-text">
-          {loading
-            ? "Fetching weather summary..."
-            : agentWeatherInfo}
+          {/* 3. FIX: Display content directly based on loading state */}
+          {loading ? "Fetching weather summary..." : renderForecast()}
         </div>
       </div>
-      
     </div>
   );
 };

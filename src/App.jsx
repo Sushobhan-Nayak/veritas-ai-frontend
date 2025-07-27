@@ -8,11 +8,13 @@ import Ask from './pages/ask';
 import Profit from './pages/profit';
 import GovtInfo from './pages/govtInfo';
 import EarlyWarning from './pages/earlyWarning';
+import GoogleTranslate from "./components/googleTranslate";
 
 function App() {
 
   return (
     <Router>
+      <GoogleTranslate />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/yield" element={<Yield />} />

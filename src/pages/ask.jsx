@@ -28,6 +28,7 @@ const Ask = ({ isOpen, onClose }) => {
   const [isLoading, setIsLoading] = useState(false);
   const conversationEndRef = useRef(null);
   const [voices, setVoices] = useState([]);
+  const [speakingIndex, setSpeakingIndex] = useState(null); // New state
 
   useEffect(() => {
     const getVoices = () => {
@@ -50,12 +51,13 @@ const Ask = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     if (isOpen) {
-      // Optional: Add a welcome message when the modal opens
       setMessages([
-        { role: "bot", content: "Hello! How can I help you today?" },
+        {
+          role: "bot",
+          content: "Hello, I am your Veritas Buddy! How can I help you today?",
+        },
       ]);
     } else {
-      // Cleanup when modal is closed
       SpeechRecognition.stopListening();
       resetTranscript();
       setInputValue("");
@@ -72,24 +74,17 @@ const Ask = ({ isOpen, onClose }) => {
     conversationEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
 
-  if (!isOpen) {
-    return null;
-  }
+  if (!isOpen) return null;
 
-  const handleSpeak = (text) => {
+  const handleSpeak = (text, index) => {
     if ("speechSynthesis" in window) {
-      // Stop any currently playing speech to avoid overlaps
       window.speechSynthesis.cancel();
 
       const utterance = new SpeechSynthesisUtterance(text);
       const lang = document.documentElement.lang || "en-US";
       utterance.lang = lang;
 
-      // Find the best voice for the detected language
-      // 1. Try for an exact match (e.g., "hi-IN")
       let voice = voices.find((v) => v.lang === lang);
-
-      // 2. If no exact match, try for a match on the language part (e.g., "hi")
       if (!voice) {
         const langPart = lang.split("-")[0];
         voice = voices.find((v) => v.lang.startsWith(langPart));
@@ -99,9 +94,22 @@ const Ask = ({ isOpen, onClose }) => {
         utterance.voice = voice;
       }
 
+      setSpeakingIndex(index);
+
+      utterance.onend = () => {
+        setSpeakingIndex(null);
+      };
+
       window.speechSynthesis.speak(utterance);
     } else {
       alert("Sorry, your browser does not support text-to-speech.");
+    }
+  };
+
+  const handleStopSpeaking = () => {
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+      setSpeakingIndex(null);
     }
   };
 
@@ -109,9 +117,7 @@ const Ask = ({ isOpen, onClose }) => {
     const userMessage = inputValue.trim();
     if (!userMessage || isLoading) return;
 
-    if (listening) {
-      stopListening();
-    }
+    if (listening) stopListening();
 
     setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
     setInputValue("");
@@ -137,7 +143,7 @@ const Ask = ({ isOpen, onClose }) => {
       const response = await axios.post(ASK_API_URL, payload, {
         headers: { "Content-Type": "application/json" },
       });
-
+      console.log(response);
       const botMessage =
         response.data.answer || "Sorry, I couldn't get a response.";
       setMessages((prev) => [...prev, { role: "bot", content: botMessage }]);
@@ -156,8 +162,14 @@ const Ask = ({ isOpen, onClose }) => {
     SpeechRecognition.stopListening();
     resetTranscript();
     setInputValue("");
-    setMessages([{ role: "bot", content: "Hello! How can I help you today?" }]);
+    setMessages([
+      {
+        role: "bot",
+        content: "Hello, I am Veritas Buddy! How can I help you today?",
+      },
+    ]);
     setIsLoading(false);
+    setSpeakingIndex(null);
   };
 
   const handleKeyPress = (e) => {
@@ -168,6 +180,11 @@ const Ask = ({ isOpen, onClose }) => {
   };
 
   const startListening = () => {
+    navigator.mediaDevices
+      .getUserMedia({ audio: true })
+      .then(() => console.log("Mic permission granted"))
+      .catch((err) => console.error("Mic access denied:", err));
+
     resetTranscript();
     SpeechRecognition.startListening({ continuous: true, language: "en-IN" });
   };
@@ -194,10 +211,18 @@ const Ask = ({ isOpen, onClose }) => {
                   {msg.role === "bot" && (
                     <button
                       className="speaker-button"
-                      onClick={() => handleSpeak(msg.content)}
-                      title="Read aloud"
+                      onClick={() =>
+                        speakingIndex === index
+                          ? handleStopSpeaking()
+                          : handleSpeak(msg.content, index)
+                      }
+                      title={
+                        speakingIndex === index
+                          ? "Stop speaking"
+                          : "Read aloud"
+                      }
                     >
-                      🔊
+                      {speakingIndex === index ? "⏹️" : "🔊"}
                     </button>
                   )}
                 </div>

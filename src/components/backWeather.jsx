@@ -9,6 +9,7 @@ const BackWeather = () => {
       <div
         style={{
           position: "relative",
+          padding: '2rem'
         }}
       >
         <button
@@ -16,9 +17,9 @@ const BackWeather = () => {
           className="back-button"
           style={{
             position: "absolute",
-            left: "5px",
-            top: "-23px",
-            transform: "translateY(-100%)",
+            // left: "5px",
+            top: "-10px",
+            // transform: "translateY(-100%)",
             zIndex: 10,
           }}
         >
